@@ -1,0 +1,413 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Testing API Calls</title>
+
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1"> 
+		
+		<link href="http://fonts.googleapis.com/css?family=Kaushan+Script" rel="stylesheet" type="text/css">
+
+  <script src="js/jquery.js"></script>
+  <script src="js/jquery.mobile-1.4.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/jquery.mobile.squareui.css" />
+  <link type="text/css" rel="stylesheet" href="css/jqm-font-awesome-usvg-ipng.min.css" />
+  <link rel="stylesheet" type="text/css" href="css/jquery-mobile-fluid960.css" />
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+		<script type="text/javascript">
+
+		var netID;
+		var students=[];
+		var stu20 = [];
+
+		var source = "http://media.mnn.com/sites/default/files/goat.jpg";
+$( function() {
+    $( "#popup-outside-page" ).enhanceWithin().popup();
+});
+			$(document).ready(function(){
+
+				// Instantiate the popup on DOMReady, and enhance its contents
+
+
+
+
+				$.getJSON( "https://itpdirectory.herokuapp.com/api/students", function( data ) {
+					students= data.data;
+					console.log(students.length);
+				for (var i =0; i<students.length; i++){
+					if (students[i].photo !=""){
+						source = students[i].photo;
+						$( "#main" ).append( "<div class=\"s-container\" id=\""+i+"\"><div class=\"polaroid\" ><img src=\""+source+"\"/><p>"
+							+students[i].name.firstName+ 
+							" "
+							+students[i].name.lastName+
+							"&nbsp; &nbsp; <i class='fa fa-play-circle trans'></i></p></div></div>" );
+					}else{
+						source = "goat.jpg";
+						//console.log(source);
+					}
+
+				}		
+					rand20();	
+					display20();
+				});
+
+
+
+			$(document).on('click', '#setUser', function(){     
+		        // store some data
+		        storeObject.netId = $("#netId").val();
+		        //https://itpdirectory.herokuapp.com/api/student/{{netId}}
+				
+					$.mobile.changePage("#profile");
+				});
+
+			$(document).on('click', '#getUser', function(){     
+		        // store some data
+		        searchObject.netId = $("#sNetId").val();
+		        //https://itpdirectory.herokuapp.com/api/student/{{netId}}
+				
+					$.mobile.changePage("#results");
+				});
+
+
+
+
+
+		        //console.log("got it!");
+		        //Change page
+		        
+		    }); 
+
+			$(document).on('pagebeforeshow', '#results', function(){ 
+				$.getJSON( "https://itpdirectory.herokuapp.com/api/student/"+searchObject.netId, function( data ) {
+					searchObject.firstName = data.data.name.firstName;
+					searchObject.lastName = data.data.name.lastName;
+					searchObject.loc = data.data.location;
+					
+					if(data.data.photo !=""){
+							searchObject.photo =data.data.photo;
+							
+						}else{
+							searchObject.photo = "goat.jpg";
+						}
+						document.getElementById("them").innerHTML = searchObject.firstName +" " + searchObject.lastName;
+    				$( "#them" ).html("<img src=\""+searchObject.photo+"\" /> <p class='cent'>"+searchObject.firstName+ " "+searchObject.lastName+"&nbsp; &nbsp; <i class='fa fa-play-circle trans'></i></p>");
+    				$ ("#t-container").css("display", "block");
+
+
+				});
+				
+			 });
+
+		    $(document).on('pagebeforeshow', '#profile', function(){     
+    			//alert(storeObject.firstName + " "+ storeObject.lastName);
+    			$.getJSON( "https://itpdirectory.herokuapp.com/api/student/"+storeObject.netId, function( data ) {
+						storeObject.firstName = data.data.name.firstName;
+						storeObject.lastName = data.data.name.lastName;
+						storeObject.loc = data.data.location;
+						
+						if(data.data.photo !=""){
+							storeObject.photo =data.data.photo;
+							
+						}else{
+							storeObject.photo = "goat.jpg";
+						}
+					document.getElementById("user").innerHTML = storeObject.firstName +" " + storeObject.lastName;
+    				$( "#you" ).html("<img src=\""+storeObject.photo+"\" /> <p>"+storeObject.firstName+ " "+storeObject.lastName+"</p>");
+    				$ ("#me").css("display", "block");
+    				//document.getElementById("location").innerHTML+= " "+storeObject.loc;
+
+
+
+			});
+
+    		
+
+
+				
+			});
+
+			// Store object
+			var storeObject = {
+			    netId : '',
+			    firstName : '',
+			    lastName : '',
+			    photo : '',
+			    loc:''
+			}
+
+			// Search object
+			var searchObject = {
+			    netId : '',
+			    firstName : '',
+			    lastName : '',
+			    photo : '',
+			    loc:''
+			}
+
+			function new20(){
+    			
+    			rand20();	
+				display20();
+    		}
+
+    		function rand20(){
+    			stu20 = [];
+				for (var j = 0; j < 20; j++){
+					
+					var r = Math.floor(Math.random()*students.length);
+					//console.log(r);
+					stu20.push(r);
+							
+				}
+				console.log(stu20.length);
+			}
+				
+
+			function display20(){
+				for (var j = 0; j < students.length; j++){
+					$("#"+j).css("display", "none");
+				}
+				for(var i =0; i<stu20.length; i++){		
+					var n = stu20[i];
+					$("#"+n).css("display","block");				
+				}
+			}
+
+			
+		</script>
+		<style>
+			img{
+				width:95%;
+				height:auto;
+			}
+
+			.polaroid {
+  			position: relative;
+  			
+	vertical-align: middle;
+	margin-bottom: 20px;
+	
+			}
+
+			.s-container{
+				display:none;
+			}
+ 
+.polaroid img {
+  border: 10px solid #fff;
+  border-bottom: 55px solid #fff;
+  -webkit-box-shadow: 3px 3px 3px #777;
+     -moz-box-shadow: 3px 3px 3px #777;
+          box-shadow: 3px 3px 3px #777;
+}
+ 
+.polaroid p {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  bottom: 0px;
+  font: 400 20px/1 'Kaushan Script', cursive;
+  color: #888;
+
+}
+
+h1, h2, h3, h4, h5, h6{
+	  font: 400 20px/1 'Kaushan Script', cursive;
+}
+
+.ui-panel-inner {
+	padding:0px; /*make the buttons flush edge to edge*/
+}
+.ui-controlgroup {
+	margin:0; /*make the buttons flush to the top*/
+}
+
+.trans{
+	color:rgba(0,0,0,0.5);
+}
+
+.cent{
+
+}
+</style>
+	</head>
+	<body>
+
+
+
+
+<div id="popup-outside-page" data-theme="a">
+    	<div data-role="header">
+		<a data-iconpos="notext" data-role="button" data-icon="fa-user" title="Home" ></a>
+		<h1 style="text-align:left; margin-left:50px;" >Search</h1>
+	</div><!-- /header -->
+	<div data-role="content" style="margin-top:10%; text-align:center; padding:10% 20%">
+		
+		  <label for="sNetId"><em>Search by NetID:</em></label>
+  <input type="text" name="sNetId" id="sNetId" data-clear-btn="true">
+  <p><a href="#" id="getUser" class="ui-btn">Go</a></p>
+	</div>
+
+</div>
+
+
+
+<!-- Start of Login page -->
+<div data-role="page" id="enter">
+
+
+
+
+<!--header-->
+
+
+
+	<div data-role="header">
+		<a data-iconpos="notext" data-role="button" data-icon="fa-user" title="Home" >Home</a>
+		<h1 style="text-align:left; margin-left:50px;" >Student Directory</h1>
+      <!-- <a href="#mypanel" data-iconpos="notext" data-role="button" data-icon="flat-menu" data-iconpos="notext">MENU</a> -->
+	</div><!-- /header -->
+
+	<div data-role="content" style="margin-top:10%; text-align:center; padding:10% 20%">	
+	
+  <label for="netId"><em>Please enter your NetID:</em></label>
+  <input type="text" name="netId" id="netId" data-clear-btn="true">
+  <p><a href="#" id="setUser" class="ui-btn">Continue</a></p>
+
+
+		
+	</div><!-- /content -->
+
+	<div data-role="footer" data-position="fixed">
+		<div data-role="navbar">
+      		<ul>
+      			<li>
+      				<a data-iconpos="notext" data-role="button" data-icon="fa-user" title="Me" href="#profile"></a>
+      			</li>
+      			<li><a data-iconpos="notext" data-role="button" data-icon="fa-random" title="Flash" href="#random20" ></a></li>
+      			<li><a data-iconpos="notext" data-role="button" data-icon="fa-search" title="Find" ></a></li>
+      			
+      			
+
+      		</ul>
+      	</div>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+<!-- Start of Profile page -->
+<div data-role="page" id="profile">
+
+	<div data-role="header">
+	<a data-iconpos="notext" data-role="button" data-icon="fa-user" title="Home" >Home</a>
+	<h1 id="user" style="text-align:left; margin-left:50px;"></h1>
+	<a data-iconpos="notext" data-rel="back" data-icon="back" data-iconpos="notext">MENU</a>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+	<div class="s-container" id="me">
+		<div id="you" class="polaroid">
+	
+
+			
+		</div>	
+		<div data-role="navbar"  >
+			<ul style="text-align:center;">
+      			<li><i class="fa fa-camera-retro fa-2x trans"></i></li>
+      			<li><i class="fa fa-upload fa-2x trans"></i></li>
+      			<li><i class="fa fa-microphone fa-2x trans"></i></li>      			
+      			<li><i class="fa fa-play-circle fa-2x trans"></i></li>
+      			<li><i class="fa fa-pencil-square fa-2x trans"></i></li>
+      		</ul>
+		</div>
+	</div>		
+		<!-- <p><a href="#enter" class="ui-btn">Back to Login</a></p> -->	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-position="fixed">
+		<div data-role="navbar">
+      		<ul>
+      			<li>
+      				<a data-iconpos="notext" data-role="button" data-icon="fa-user" title="Me" href="#profile"></a>
+      			</li>
+      			<li><a data-iconpos="notext" data-role="button" data-icon="fa-random" title="Flash" href="#random20" ></a></li>
+      			<li><a data-iconpos="notext" data-role="button" data-icon="fa-search" title="Find" data-rel="popup" href="#popup-outside-page" data-position-to="window" ></a></li>
+      			
+      			
+
+      		</ul>
+      	</div>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Random 20 page -->
+<div data-role="page" id="random20">
+
+<div data-role="header" data-position="fixed">
+	<a data-iconpos="notext" data-role="button" data-icon="fa-user" title="Home" >Home</a>
+	<h1 id="user" style="text-align:left; margin-left:50px;">Student Directory</h1>
+	<a data-iconpos="notext" data-rel="back" data-icon="back" data-iconpos="notext">MENU</a>
+	</div><!-- /header -->
+
+	<div data-role="content" id="main">	
+			
+	</div><!-- /content -->
+
+	<div data-role="footer" data-position="fixed">
+		<div data-role="navbar">
+      		<ul>
+      			<li>
+      				<a data-iconpos="notext" data-role="button" data-icon="fa-user" title="Me" href="#profile"></a>
+      			</li>
+      			<li><a data-iconpos="notext" data-role="button" data-icon="fa-random" title="Flash" onclick="new20();" ></a></li>
+      			<li><a data-iconpos="notext" data-role="button" data-icon="fa-search" title="Find"  data-rel="popup" href="#popup-outside-page" data-position-to="window"></a></li>
+      			
+      			
+
+      		</ul>
+      	</div>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Search Resule Page page -->
+<div data-role="page" id="results">
+
+	<div data-role="header">
+	<a data-iconpos="notext" data-role="button" data-icon="fa-user" title="Home" >Home</a>
+	<h1 id="user" style="text-align:left; margin-left:50px;"></h1>
+	<a data-iconpos="notext" data-rel="back" data-icon="back" data-iconpos="notext">MENU</a>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+	<div class="s-container" id="t-container">
+		<div id="them" class="polaroid">
+	
+
+			
+		</div>
+	
+	</div>	
+		<!-- <p><a href="#enter" class="ui-btn">Back to Login</a></p> -->	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-position="fixed">
+		<div data-role="navbar">
+      		<ul>
+      			<li>
+      				<a data-iconpos="notext" data-role="button" data-icon="fa-user" title="Me" href="#profile"></a>
+      			</li>
+      			<li><a data-iconpos="notext" data-role="button" data-icon="fa-random" title="Flash" href="#random20" ></a></li>
+      			<li><a data-iconpos="notext" data-role="button" data-icon="fa-search" title="Find" data-rel="popup" href="#popup-outside-page" data-position-to="window" ></a></li>
+      			
+      			
+
+      		</ul>
+      	</div>
+	</div><!-- /footer -->
+</div><!-- /page -->
+		
+	</body>
+</html>
